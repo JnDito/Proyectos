@@ -1,0 +1,15 @@
+datos.json
+__pycache__/
+
+.venv/
+venv/
+
+.env/
+.env.*
+!env.example
+
+.vscode/
+.idea/
+
+.DS_Store
+Thumbs.db

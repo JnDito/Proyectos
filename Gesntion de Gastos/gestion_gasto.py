@@ -7,6 +7,17 @@ saldo = 0
 gastos = []
 ingreso = []
 
+def atualizar_datos():
+    datos = {
+        "total_ingresos": total_ingresos,
+        "total_egresos": total_egresos,
+        "saldo": saldo,
+        "gastos": gastos,
+        "ingreso": ingreso
+    }
+    with open("datos.json", "w") as archivo:
+        js.dump(datos, archivo)
+
 def ingresar_monto():
     while True:
         try:
@@ -24,7 +35,7 @@ def validar_fechaingresa(fecha_texto):
         datetime.datetime.strptime(fecha_texto, "%d/%m/%Y")
         return True
     except ValueError:
-        return 
+        return False
 
 def ingresar_fecha():
     fecha = input("Ingrese la fecha (dd/mm/aaaa): ")
@@ -32,6 +43,21 @@ def ingresar_fecha():
         print("Fecha inválida. Por favor, ingrese una fecha válida en el formato dd/mm/aaaa.")
         fecha = input("Ingrese la fecha (dd/mm/aaaa): ")
     return fecha
+
+def cargar_datos():
+    global total_ingresos, total_egresos, saldo, gastos, ingreso
+    try:
+        with open("datos.json", "r") as archivo:
+            datos = js.load(archivo)
+            total_ingresos = datos.get("total_ingresos", 0)
+            total_egresos = datos.get("total_egresos", 0)
+            saldo = datos.get("saldo", 0)
+            gastos = datos.get("gastos", [])
+            ingreso = datos.get("ingreso", [])
+    except FileNotFoundError:
+        pass
+
+cargar_datos()
 
 while True:
     opcion = input("Ingrese una opción:\n" \
@@ -50,6 +76,7 @@ while True:
         total_ingresos += monto
         saldo += monto
         print(f"Ingreso registrado: {fecha} - {descripcion}: S/. {monto}\n")
+        atualizar_datos()
 
     elif opcion == "2":
         print("\n-----Registrar Egreso-----")
@@ -59,6 +86,8 @@ while True:
         total_egresos += monto
         saldo -= monto
         print(f"Egreso registrado: {fecha} - {descripcion}: S/. {monto}\n")
+        atualizar_datos()
+
     elif opcion == "3":
         print(f"\n-----Ingresos-----\n")
         for fecha, descripcion, monto in ingreso:
@@ -68,13 +97,16 @@ while True:
         print(f"\n-----Gastos-----\n")
         for fecha, descripcion, monto in gastos:
             print(f"{fecha} - {descripcion}: S/. {monto}\n")
+
     elif opcion == "5":
         print(f"\n-----Montos Totales-----\n")
         print(f"Total Ingresos: S/. {total_ingresos}")
         print(f"Total Egresos: S/. {total_egresos}")
         print(f"Saldo: S/. {saldo}\n")
+
     elif opcion == "6":
         print("Saliendo del programa...")
         break
+
     else:
         print("Opción inválida. Por favor, ingrese una opción válida.\n")
